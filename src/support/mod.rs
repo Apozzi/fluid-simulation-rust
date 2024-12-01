@@ -11,6 +11,9 @@ use winit::window::WindowId;
 use winit::application::ApplicationHandler;
 
 pub mod camera;
+pub mod mouse;
+
+use mouse::Mouse;
 
 
 pub trait ApplicationContext {
@@ -31,11 +34,11 @@ struct App<T> {
     state: Option<State<T>>,
     visible: bool,
     close_promptly: bool,
+    old_mouse_x: i16,
+    old_mouse_y: i16
 }
 
 impl<T: ApplicationContext + 'static> ApplicationHandler<()> for App<T> {
-    // The resumed/suspended handlers are mostly for Android compatiblity since the context can get lost there at any point.
-    // For convenience's sake, the resumed handler is also called on other platforms on program startup.
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         self.state = Some(State::new(event_loop, self.visible));
         if !self.visible && self.close_promptly {
@@ -66,8 +69,6 @@ impl<T: ApplicationContext + 'static> ApplicationHandler<()> for App<T> {
                     }
                 }
             },
-            // Exit the event loop when requested (by closing the window for example) or when
-            // pressing the Esc key.
             glium::winit::event::WindowEvent::CloseRequested
             | glium::winit::event::WindowEvent::KeyboardInput { event: glium::winit::event::KeyEvent {
                 state: glium::winit::event::ElementState::Pressed,
@@ -77,7 +78,16 @@ impl<T: ApplicationContext + 'static> ApplicationHandler<()> for App<T> {
                 event_loop.exit()
             },
             glium::winit::event::WindowEvent::CursorMoved { position, .. } => {
-                println!("Mouse position: {:?}x{:?}", position.x as u16, position.y as u16);
+                let position_x: i16 = position.x as i16;
+                let position_y: i16 = position.y as i16;
+
+                Mouse::update_position(position_x, position_y);
+        
+                let (delta_x, delta_y) = Mouse::get_delta();
+                let (x, y) = Mouse::get_position();
+        
+                println!("Delta mouse position: {}x{}", delta_x, delta_y);
+                println!("Mouse position: {}x{}", x, y);
             },
             glium::winit::event::WindowEvent::MouseInput { state, button, .. } => {
                 if state == glium::winit::event::ElementState::Pressed {
@@ -171,6 +181,8 @@ impl<T: ApplicationContext + 'static> State<T> {
             state: None,
             visible: true,
             close_promptly: false,
+            old_mouse_x: 0,
+            old_mouse_y: 0
         };
         let result = event_loop.run_app(&mut app);
         result.unwrap();
@@ -185,6 +197,8 @@ impl<T: ApplicationContext + 'static> State<T> {
             state: None,
             visible,
             close_promptly: true,
+            old_mouse_x: 0,
+            old_mouse_y: 0
         };
         let result = event_loop.run_app(&mut app);
         result.unwrap();
