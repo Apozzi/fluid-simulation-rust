@@ -24,17 +24,15 @@ impl ApplicationContext for Application {
     const WINDOW_TITLE: &'static str = "Glium grid example";
 
     fn new(display: &Display<WindowSurface>) -> Self {
-        // Define o tamanho da grid
         let grid_size = 201; 
         let cell_size = 0.01;
 
         let mut vertices = Vec::new();
         let mut indices = Vec::new();
 
-        // Criação dos quadrados
         for row in 0..grid_size {
             for col in 0..grid_size {
-                // Cálculo das posições para começar do topo (-1.0, 1.0) e avançar para baixo
+                
                 let x = 1.0 - col as f32 * cell_size;
                 let y = 1.0 - row as f32 * cell_size;
 
@@ -63,12 +61,10 @@ impl ApplicationContext for Application {
             }
         }
 
-        // Criação do VertexBuffer e IndexBuffer
         let vertex_buffer = glium::VertexBuffer::new(display, &vertices).unwrap();
         let index_buffer =
             glium::IndexBuffer::new(display, PrimitiveType::TrianglesList, &indices).unwrap();
 
-        // Compilação dos shaders
         let program = program!(display,
             100 => {
                 vertex: "
@@ -106,11 +102,7 @@ impl ApplicationContext for Application {
 
     fn draw_frame(&mut self, display: &Display<WindowSurface>) {
         let mut frame = display.draw();
-
-        // Limpa a tela com um fundo preto
         frame.clear_color(0.0, 0.0, 0.0, 1.0);
-
-        // Desenha a grade
         frame
             .draw(
                 &self.vertex_buffer,
