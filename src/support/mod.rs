@@ -1,3 +1,4 @@
+
 #![allow(dead_code)]
 use std::num::NonZeroU32;
 use glium::Display;
@@ -14,7 +15,10 @@ pub mod camera;
 pub mod mouse;
 pub mod field;
 
+// 800x600
+
 use mouse::Mouse;
+//use field::VectorField2D;
 
 
 pub trait ApplicationContext {
@@ -86,6 +90,8 @@ impl<T: ApplicationContext + 'static> ApplicationHandler<()> for App<T> {
         
                 let (delta_x, delta_y) = Mouse::get_delta();
                 let (x, y) = Mouse::get_position();
+
+                //VectorField2D::onMouseClick(x, y, delta_x, delta_y);
         
                 println!("Delta mouse position: {}x{}", delta_x, delta_y);
                 println!("Mouse position: {}x{}", x, y);
