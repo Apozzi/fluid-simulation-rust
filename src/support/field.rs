@@ -70,3 +70,14 @@ impl ColorField2D {
         }
     }
 }
+
+impl VectorField2D {
+
+    pub fn onMouseClick(&self, x: i16, y: i16, deltaX: i16, deltaY: i16) {
+        let magnitude = 10;
+
+
+    }
+
+
+}

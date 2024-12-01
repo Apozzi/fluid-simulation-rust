@@ -120,18 +120,13 @@ impl<T: ApplicationContext + 'static> State<T> {
         let config_template_builder = glutin::config::ConfigTemplateBuilder::new();
         let display_builder = glutin_winit::DisplayBuilder::new().with_window_attributes(Some(window_attributes));
 
-        // First we create a window
         let (window, gl_config) = display_builder
             .build(event_loop, config_template_builder, |mut configs| {
-                // Just use the first configuration since we don't have any special preferences here
                 configs.next().unwrap()
             })
             .unwrap();
         let window = window.unwrap();
 
-        // Then the configuration which decides which OpenGL version we'll end up using, here we just use the default which is currently 3.3 core
-        // When this fails we'll try and create an ES context, this is mainly used on mobile devices or various ARM SBC's
-        // If you depend on features available in modern OpenGL Versions you need to request a specific, modern, version. Otherwise things will very likely fail.
         let window_handle = window.window_handle().expect("couldn't obtain window handle");
         let context_attributes = glutin::context::ContextAttributesBuilder::new().build(Some(window_handle.into()));
         let fallback_context_attributes = glutin::context::ContextAttributesBuilder::new()
@@ -173,7 +168,6 @@ impl<T: ApplicationContext + 'static> State<T> {
         }
     }
 
-    /// Start the event_loop and keep rendering frames until the program is closed
     pub fn run_loop() {
         let event_loop = glium::winit::event_loop::EventLoop::builder()
             .build()
@@ -189,7 +183,6 @@ impl<T: ApplicationContext + 'static> State<T> {
         result.unwrap();
     }
 
-    /// Create a context and draw a single frame
     pub fn run_once(visible: bool) {
         let event_loop = glium::winit::event_loop::EventLoop::builder()
             .build()
