@@ -21,7 +21,6 @@ struct Application {
     pub program: glium::Program,
     pub color_matrix: Vec<Vec<[f32; 3]>>,
     pub time: f32,
-    pub color_field: ColorField2D,
     pub velocity_field: VectorField2D
 }
 
@@ -148,7 +147,6 @@ impl ApplicationContext for Application {
         let fieldHeight = 40;
 
         let initial_color = 1.0;
-        let mut color_field = ColorField2D::new(fieldHeight, fieldHeight, initial_color);
         let mut velocity_field = VectorField2D {
             width: fieldWidth,
             height: fieldHeight,
@@ -200,7 +198,6 @@ impl ApplicationContext for Application {
             program,
             color_matrix,
             time: 0.0,
-            color_field,
             velocity_field
         }
     }
