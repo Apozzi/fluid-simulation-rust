@@ -6,6 +6,7 @@ use glium::index::PrimitiveType;
 use glium::{Display, Surface};
 use glutin::surface::WindowSurface;
 use support::{ApplicationContext, State};
+use support::field::{ColorField2D, VectorField2D};
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -20,6 +21,8 @@ struct Application {
     pub program: glium::Program,
     pub color_matrix: Vec<Vec<[f32; 3]>>,
     pub time: f32,
+    pub color_field: ColorField2D,
+    pub velocity_field: VectorField2D
 }
 
 fn generate_color_matrix(grid_size: usize, time: f32) -> Vec<Vec<[f32; 3]>> {
@@ -77,11 +80,81 @@ fn generate_grid_data(grid_size: usize, cell_size: f32, color_matrix: &Vec<Vec<[
     (vertices, indices)
 }
 
+fn generate_arrows(grid_size: usize, cell_size: f32, velocity_field: &VectorField2D) -> (Vec<Vertex>, Vec<u32>) {
+    let mut vertices = Vec::new();
+    let mut indices = Vec::new();
+
+    for row in 0..velocity_field.height {
+        for col in 0..velocity_field.width {
+            let x = 1.0 - col as f32 * cell_size;
+            let y = 1.0 - row as f32 * cell_size;
+
+            let direction = velocity_field.field[row][col];
+            let dx = direction[0] * 0.05;
+            let dy = direction[1] * 0.05;
+
+            let start = vertices.len() as u32;
+            vertices.push(Vertex {
+                position: [x, y],
+                color: [1.0, 1.0, 1.0],
+            });
+            vertices.push(Vertex {
+                position: [x + dx, y + dy],
+                color: [1.0, 1.0, 1.0],
+            });
+
+            indices.push(start);
+            indices.push(start + 1);
+
+            // Ponta da flecha (duas linhas formando um "V")
+            let arrow_size = 0.05;
+            let left = [
+                x + dx - dy * arrow_size,
+                y + dy + dx * arrow_size,
+            ];
+            let right = [
+                x + dx + dy * arrow_size,
+                y + dy - dx * arrow_size,
+            ];
+
+            vertices.push(Vertex {
+                position: left,
+                color: [1.0, 1.0, 1.0],
+            });
+            vertices.push(Vertex {
+                position: right,
+                color: [1.0, 1.0, 1.0],
+            });
+
+            indices.push(start + 1);
+            indices.push(start + 2);
+
+            indices.push(start + 1);
+            indices.push(start + 3);
+        }
+    }
+
+    (vertices, indices)
+}
+
 impl ApplicationContext for Application {
     const WINDOW_TITLE: &'static str = "Glium grid example";
 
 
     fn new(display: &Display<WindowSurface>) -> Self {
+        //-- Field
+        let fieldWidth = 40;
+        let fieldHeight = 40;
+
+        let initial_color = 1.0;
+        let mut color_field = ColorField2D::new(fieldHeight, fieldHeight, initial_color);
+        let mut velocity_field = VectorField2D {
+            width: fieldWidth,
+            height: fieldHeight,
+            field: vec![vec![[0.5, 0.5]; fieldWidth]; fieldHeight],
+        };
+
+        // -- Grid
             
         let grid_size = 201; 
         let cell_size = 0.01;
@@ -126,6 +199,8 @@ impl ApplicationContext for Application {
             program,
             color_matrix,
             time: 0.0,
+            color_field,
+            velocity_field
         }
     }
 
@@ -150,11 +225,28 @@ impl ApplicationContext for Application {
             )
             .unwrap();
 
+        let cell_size_field = 0.05;
+
+        let (arrow_vertices, arrow_indices) = generate_arrows(self.velocity_field.width, cell_size_field, &self.velocity_field);
+        let arrow_vertex_buffer = glium::VertexBuffer::new(display, &arrow_vertices).unwrap();
+        let arrow_index_buffer = glium::IndexBuffer::new(display, PrimitiveType::LinesList, &arrow_indices).unwrap();
+
+        frame
+            .draw(
+                &arrow_vertex_buffer,
+                &arrow_index_buffer,
+                &self.program,
+                &uniform! {},
+                &Default::default(),
+            )
+            .unwrap();
+
         frame.finish().unwrap();
         
     }
 }
 
 fn main() {
+    
     State::<Application>::run_loop();
 }

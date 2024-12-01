@@ -12,6 +12,7 @@ use winit::application::ApplicationHandler;
 
 pub mod camera;
 pub mod mouse;
+pub mod field;
 
 use mouse::Mouse;
 
