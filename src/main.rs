@@ -106,16 +106,18 @@ fn generate_arrows(grid_size: usize, cell_size: f32, velocity_field: &VectorFiel
             indices.push(start);
             indices.push(start + 1);
 
-            // Ponta da flecha (duas linhas formando um "V")
-            let arrow_size = 0.05;
+            let arrow_size = 0.5;
             let left = [
-                x + dx - dy * arrow_size,
-                y + dy + dx * arrow_size,
+                x + ( dx - dy) * arrow_size,
+                y + ( dy + dx) * arrow_size,
             ];
             let right = [
-                x + dx + dy * arrow_size,
-                y + dy - dx * arrow_size,
+                x + (dx + dy) * arrow_size,
+                y + (dy - dx) * arrow_size,
             ];
+
+            let left_idx = vertices.len() as u32;
+            let right_idx = left_idx + 1;
 
             vertices.push(Vertex {
                 position: left,
@@ -127,10 +129,9 @@ fn generate_arrows(grid_size: usize, cell_size: f32, velocity_field: &VectorFiel
             });
 
             indices.push(start + 1);
-            indices.push(start + 2);
-
+            indices.push(left_idx);
             indices.push(start + 1);
-            indices.push(start + 3);
+            indices.push(right_idx);
         }
     }
 
