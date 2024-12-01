@@ -27,9 +27,9 @@ fn generate_color_matrix(grid_size: usize) -> Vec<Vec<[f32; 3]>> {
     for row in 0..grid_size {
         for col in 0..grid_size {
             color_matrix[row][col] = [
-                (row as f32 / grid_size as f32),      // Red increases with row
-                (col as f32 / grid_size as f32),      // Green increases with column
-                ((row + col) as f32 / (2 * grid_size) as f32)  // Blue is a mix of row and column
+                (row as f32 / grid_size as f32),  
+                (col as f32 / grid_size as f32),
+                ((row + col) as f32 / (2 * grid_size) as f32)
             ];
         }
     }
