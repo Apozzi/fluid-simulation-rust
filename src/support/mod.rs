@@ -151,7 +151,14 @@ impl<T: ApplicationContext + 'static> ApplicationHandler<()> for App<T> {
             }, ..} => {
                 event_loop.exit()
             },
-            // Every other event
+            glium::winit::event::WindowEvent::CursorMoved { position, .. } => {
+                println!("Mouse position: {:?}x{:?}", position.x as u16, position.y as u16);
+            },
+            glium::winit::event::WindowEvent::MouseInput { state, button, .. } => {
+                if state == glium::winit::event::ElementState::Pressed {
+                    println!("Mouse clicked: {:?}", button);
+                }
+            },
             ev => {
                 if let Some(state) = &mut self.state {
                     state.context.handle_window_event(&ev, &state.window);

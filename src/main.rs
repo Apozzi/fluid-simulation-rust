@@ -151,6 +151,7 @@ impl ApplicationContext for Application {
             .unwrap();
 
         frame.finish().unwrap();
+        
     }
 }
 
