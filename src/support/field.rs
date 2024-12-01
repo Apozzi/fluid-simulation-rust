@@ -74,9 +74,40 @@ impl ColorField2D {
 impl VectorField2D {
 
     pub fn onMouseClick(&self, x: i16, y: i16, deltaX: i16, deltaY: i16) {
-        let magnitude = 10;
+        // É necessário ver como chamar e como passar referencia de field.
+        /*
+        let magnitude = 10.0;
+        let screenRatioX = 40.0 / 800.0;
+        let screenRatioY = 40.0 / 600.0;
 
+        let xPos = (x as f32 * screenRatioX).round();
+        let yPos = (y as f32 * screenRatioY).round();
 
+        for (i, row) in self.field.iter_mut().enumerate() {
+            for (j, value) in row.iter_mut().enumerate() {
+                let cellX = i as f32;
+                let cellY = j as f32;
+                let distance = ((xPos - cellX).powi(2) + (yPos - cellY).powi(2)).sqrt();
+
+                let influence = 1.0 / (distance + 1.0);
+
+                let deltaMagnitudeX = (deltaX as f32) * influence * magnitude;
+                let deltaMagnitudeY = (deltaY as f32) * influence * magnitude;
+
+                let x_val = value[0];
+                let y_val = value[1];
+                let new_x_val = x_val + deltaMagnitudeX;
+                let new_y_val = y_val + deltaMagnitudeY;
+
+                // Usando o método set para alterar o valor
+                if let Err(e) = self.set(i, j, [new_x_val, new_y_val]) {
+                    println!("Erro ao definir valor: {}", e);
+                }
+
+                println!("Nova posição: ({}, {}), valor alterado: ({}, {})", i, j, new_x_val, new_y_val);
+            }
+        }
+        */
     }
 
 
