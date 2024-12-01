@@ -1,7 +1,14 @@
 [package]
-name = "optical-image-stabilization-rust"
+name = "fluid-simulation-rust"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-opencv = "0.93.5"
+glium = "*"
+glutin = "*"
+winit = "0.30"
+glutin-winit = "0.5"
+rand = "0.8"
+libc = "0.2.62"
+raw-window-handle = "0.6"
+obj = { version = "0.10", features = ["genmesh"] }
