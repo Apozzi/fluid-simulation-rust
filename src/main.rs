@@ -16,7 +16,7 @@ implement_vertex!(Vertex, position, color);
 
 struct Application {
     pub vertex_buffer: glium::VertexBuffer<Vertex>,
-    pub index_buffer: glium::IndexBuffer<u16>,
+    pub index_buffer: glium::IndexBuffer<u32>,
     pub program: glium::Program,
 }
 
@@ -25,8 +25,8 @@ impl ApplicationContext for Application {
 
     fn new(display: &Display<WindowSurface>) -> Self {
         // Define o tamanho da grid
-        let grid_size = 1000; // 10x10 quadrados
-        let cell_size = 0.01; // Tamanho de cada célula (em coordenadas normalizadas)
+        let grid_size = 201; 
+        let cell_size = 0.01;
 
         let mut vertices = Vec::new();
         let mut indices = Vec::new();
@@ -35,10 +35,10 @@ impl ApplicationContext for Application {
         for row in 0..grid_size {
             for col in 0..grid_size {
                 // Cálculo das posições para começar do topo (-1.0, 1.0) e avançar para baixo
-                let x = col as f32 * cell_size - 1.0;
+                let x = 1.0 - col as f32 * cell_size;
                 let y = 1.0 - row as f32 * cell_size;
 
-                let v0 = vertices.len() as u16;
+                let v0 = vertices.len() as u32;
                 vertices.push(Vertex {
                     position: [x, y],
                     color: [1.0, 0.0, 0.0],
