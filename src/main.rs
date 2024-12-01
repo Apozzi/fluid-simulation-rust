@@ -21,41 +21,58 @@ struct Application {
 }
 
 impl ApplicationContext for Application {
-    const WINDOW_TITLE:&'static str = "Glium triangle example";
+    const WINDOW_TITLE: &'static str = "Glium grid example";
 
     fn new(display: &Display<WindowSurface>) -> Self {
-        let vertex_buffer = {
-            glium::VertexBuffer::new(
-                display,
-                &[
-                    Vertex {
-                        position: [-0.5, -0.5],
-                        color: [0.0, 1.0, 0.0],
-                    },
-                    Vertex {
-                        position: [0.0, 0.5],
-                        color: [0.0, 0.0, 1.0],
-                    },
-                    Vertex {
-                        position: [0.5, -0.5],
-                        color: [1.0, 0.0, 0.0],
-                    },
-                ],
-            )
-            .unwrap()
-        };
+        // Define o tamanho da grid
+        let grid_size = 1000; // 10x10 quadrados
+        let cell_size = 0.01; // Tamanho de cada célula (em coordenadas normalizadas)
 
-        // building the index buffer
+        let mut vertices = Vec::new();
+        let mut indices = Vec::new();
+
+        // Criação dos quadrados
+        for row in 0..grid_size {
+            for col in 0..grid_size {
+                // Cálculo das posições para começar do topo (-1.0, 1.0) e avançar para baixo
+                let x = col as f32 * cell_size - 1.0;
+                let y = 1.0 - row as f32 * cell_size;
+
+                let v0 = vertices.len() as u16;
+                vertices.push(Vertex {
+                    position: [x, y],
+                    color: [1.0, 0.0, 0.0],
+                });
+                vertices.push(Vertex {
+                    position: [x + cell_size, y],
+                    color: [0.0, 1.0, 0.0],
+                });
+                vertices.push(Vertex {
+                    position: [x + cell_size, y - cell_size],
+                    color: [0.0, 0.0, 1.0],
+                });
+                vertices.push(Vertex {
+                    position: [x, y - cell_size],
+                    color: [1.0, 1.0, 0.0],
+                });
+
+                indices.extend_from_slice(&[
+                    v0, v0 + 1, v0 + 2, 
+                    v0, v0 + 2, v0 + 3,
+                ]);
+            }
+        }
+
+        // Criação do VertexBuffer e IndexBuffer
+        let vertex_buffer = glium::VertexBuffer::new(display, &vertices).unwrap();
         let index_buffer =
-            glium::IndexBuffer::new(display, PrimitiveType::TrianglesList, &[0u16, 1, 2]).unwrap();
+            glium::IndexBuffer::new(display, PrimitiveType::TrianglesList, &indices).unwrap();
 
-        // compiling shaders and linking them together
+        // Compilação dos shaders
         let program = program!(display,
             100 => {
                 vertex: "
                     #version 100
-
-                    uniform lowp mat4 matrix;
 
                     attribute lowp vec2 position;
                     attribute lowp vec3 color;
@@ -63,7 +80,7 @@ impl ApplicationContext for Application {
                     varying lowp vec3 vColor;
 
                     void main() {
-                        gl_Position = vec4(position, 0.0, 1.0) * matrix;
+                        gl_Position = vec4(position, 0.0, 1.0);
                         vColor = color;
                     }
                 ",
@@ -89,27 +106,21 @@ impl ApplicationContext for Application {
 
     fn draw_frame(&mut self, display: &Display<WindowSurface>) {
         let mut frame = display.draw();
-        // For this example a simple identity matrix suffices
-        let uniforms = uniform! {
-            matrix: [
-                [1.0, 0.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0f32]
-            ]
-        };
 
-        // Now we can draw the triangle
-        frame.clear_color(0.0, 0.0, 0.0, 0.0);
+        // Limpa a tela com um fundo preto
+        frame.clear_color(0.0, 0.0, 0.0, 1.0);
+
+        // Desenha a grade
         frame
             .draw(
                 &self.vertex_buffer,
                 &self.index_buffer,
                 &self.program,
-                &uniforms,
+                &uniform! {},
                 &Default::default(),
             )
             .unwrap();
+
         frame.finish().unwrap();
     }
 }
